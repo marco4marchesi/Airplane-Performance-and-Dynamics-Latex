@@ -234,7 +234,117 @@ and the aerodynamic moment, which becomes:
 
 The full expression, which I will not report here because it's too long, maybe I will in the future, is the expansion of the $\Delta C_i$ coefficient in the form that we saw in [\ref{eq: linear form of aerodynamic coefficient}], leading to a matrix form depending on the multiple variables appearing in that expression.
 \\
-\textbf{Here we introduce the hypothesis} of small sensitivity to Reynolds and Mach and therefore eliminate them from the formulation, but theoretically we should consider them.
-\\
+\textbf{Here we introduce the hypothesis} of small sensitivity to Reynolds and Mach and therefore eliminate them from the formulation, but theoretically we should consider them too.
 
+\subsection{The other equations - Kinematic Equilibrium}
+As we said the equations that we just developed are not enough to resolve the system, as we need another 3 to get the 9 unknowns defined. Let's then focus on the three rotation equations
+\begin{equation}
+    \underline{\omega}_{G|I}^\beta = \underline{\underline{S}}_{321}^\beta \dot e_{321}^\beta
+\end{equation}
+
+linearizing it we obtain
+\begin{equation}
+    \underline{\omega}_{G|I_0}^\beta + \Delta\underline{\omega}_{G|I}^\beta = \underline{\underline{S}}_{321_0}^\beta \underline{\dot e}_{321_0}^\beta + \underline{\underline{S}}_{321_0}^\beta \Delta\underline{\dot e}_{321}^\beta + \Delta \underline{\underline{S}}_{321}^\beta \underline{\dot e}_{321_0}^\beta + \Delta\underline{\underline{S}}_{321}^\beta \Delta \underline{\dot e}_{321}^\beta
+\end{equation}
+A couple of remarks: the second order term is negligible and the first term of the r.h.s. is constant near the reference condition.
+\\
+It is useful to invert the system to express the Euler angles as functions of the angular rates, as we did in the dynamic equilibrium.
+\\
+In this way we get straight to the 9 equations system that we were seeking, were the unknowns are differential, meaning that \textbf{we are now searching for the perturbations of the values near the reference condition. Not the value of the states themselves.}
+\subsection{Applications of the linearized system}
+The linearized form of this system has the following applications:
+\begin{itemize}
+    \item Eigen-analysis, which allows to assess dynamic stability and performance of the controls.
+    \item Control system design, which allow or model based techniques (e.g. LQR)
+    \item Time marching simulations, which allow to simulate integrating in time including also the controls.
+\end{itemize}
+
+\subsection{Introduction of the most common geometrical hypotheses}
+The most common assumptions for an aircraft are:
+\begin{itemize}
+    \item winged;
+    \item vertical plane of symmetry;
+    \item tail to the back;
+    \item horizontal tail.
+\end{itemize}
+These allow to neglect most of the coefficient derivatives, since the effect of lateral components will not appear in longitudinal dynamics and viceversa.
+\\
+Furthermore, a lot of the coefficients depend only on the reference condition, which implies that we can choose the reference condition to simplify the expressions, namely:
+\begin{itemize}
+    \item $p_0 = r_0 = 0$, which means that the plane of symmetry does not change is orientation (no roll rate or yaw rate, only pitch rate allowed)
+    \item $v_0 = \beta_0 = 0$, which means that the plane of symmetry is not displacing laterally (no sideslip)
+    \item $\varphi_0 = 0$, the rolling attitude of the plane of symmetry is null.
+\end{itemize}
+Of course not all flights comply with these reference conditions, but many do. Steady and unsteady, horizontal and climb symmetric flight comply with these hypotheses, as well as pitch-up maneuvers.
+\\
+Also, these hypotheses are also compatible with the general (not linearized) formulation for linear equilibrium, but the set of hypotheses at the beginning is different.
+\\
+Remark that the fact that some quantities are null in the reference condition does not mean that the perturbation is also null, don't be fooled.
+\\
+The system can be further simplified by introducing other three hypotheses on the dynamic components:
+\begin{itemize}
+    \item $C_{Y_0}=0$, no lateral force in the reference condition;
+    \item $C_{L_0}=0$, no rolling moment in the reference condition;
+    \item $C_{N_0}=0$, no yawing moment in the reference condition.
+\end{itemize}
+Here is when things get interesting: with the hypotheses introduced we can finally \textbf{decouple} the system into longitudinal and lateral-directional dynamics.
+\\
+The longitudinal dynamics are 4 equations that describe the effects of $F_x, F_z, M_{G_y},\Delta \dot \theta$,  and depend only on $u, \Delta \alpha, \Delta q, \Delta \theta, \delta_e, \delta_T$; the lateral-directional dynamics 5 equations that describe the effects of $F_y, M_{G_x}, M_{G_z}, \Delta \dot \varphi, \Delta \dot \psi$ and depend only on $\Delta \beta, \Delta p, \Delta r, \Delta \varphi, \Delta \psi, \delta_a, \delta_r$.
+\subsection{State space form}
+We can rearrange the system into the classical state space form by defining the state
+\begin{equation}
+    \underline{x}_L = \begin{Bmatrix}
+        u, \Delta \alpha, \Delta q, \Delta \dot \theta
+    \end{Bmatrix}^T,
+\end{equation}
+the control action
+\begin{equation}
+    \underline{u}_L = \begin{Bmatrix}
+        \delta_e, \delta_T
+    \end{Bmatrix}^T,
+\end{equation}
+and the system matrices
+\begin{equation}
+    \underline{\underline{M}}_L = \begin{bmatrix}
+        m_1 -c_1C_{x_{\hat{\dot u}}}    & -c_1 C_{x_{\hat{\dot \alpha}}}        & 0         & 0\\
+        -C_{z_{\hat{\dot u}}}           & m_1-c_1 C_{z_{\hat{\dot \alpha}}}     & 0         & 0\\
+        -c_1C_{m_{G_{\hat{\dot u}}}}    & -c_1 C_{m_G{_{\hat{\dot \alpha}}}}    & J_{y_1}   & 0\\
+        0                               & 0                                     & 0         & 1
+    \end{bmatrix}
+\end{equation}
+\begin{equation}
+    \underline{\underline{K}}_L = \begin{bmatrix}
+        complete    &complete       & complete         & complete \\
+       complete           & complete     & complete         & complete \\
+        complete    & complete    &complete  & 0 \\
+        0                               & 0                                     & -1         & 0
+    \end{bmatrix}
+\end{equation}
+\begin{equation}
+    \underline{\underline{U}}_L = \begin{bmatrix}
+        C_{x_{\delta_e}}    &C_{x_{\delta_T}}  \\
+      C_{z_{\delta_e}}        & C_{z_{\delta_T}}  \\
+       C_{m_{G_{\delta_e}}}   & C_{m_{G_{\delta_T}}}  \\
+        0   & 0 \\
+    \end{bmatrix}
+\end{equation}
+therefore writing the matrix lagrangian form:
+\begin{equation}
+    \underline{\underline{M}}_L \underline{\dot x}_L + \underline{\underline{K}}_L \underline{x}_L = \underline{\underline{U}}_L \underline{u}_L
+\end{equation}
+which can be rewritten in state space form as
+\begin{equation}
+    \underline{\dot x}_L = \underline{\underline{A}}_L \underline{x} + \underline{\underline{B}}_L \underline{u}_L
+\end{equation}
+where
+\begin{align}
+    \underline{\underline{A}}_L &= -\underline{\underline{M}}_L^{-1}\underline{\underline{K}}_L & \underline{\underline{B}}_L &= \underline{\underline{M}}_L^{-1}\underline{\underline{U}}_L 
+\end{align}
+
+The same procedure can be applied to the lateral-directional dynamics, leading to a 5-states state-space system.
+\\
+Remark that the state space form is the gateway to the eigen-analysis and to control design, therefore very useful and important.
+Note that matrices depend on aerodynamic characteristics, inertia characteristics and components in the reference condition. \textbf{All of these quantities influence the eigen-analysis and the control design}. Another remark is that the eigen-analysis focuses on the state matrix, it does not depend on controls.
+\subsection{Effects of yaw on the system}
+The perturbation on the yaw angle $\Delta \psi$ is actually not included in the equations, its behavior is just a consequence of the other quantities and therefore can be integrated separately (in post processing) and remove its equation from the equations of the lateral-directional dynamics. It can be seen as decoupled from the other components.
 
