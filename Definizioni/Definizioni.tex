@@ -1,0 +1,76 @@
+\section{Definizioni}
+
+\subsection{Geometry}
+    \begin{itemize}
+        \item Centro aerodinamico:
+        \begin{equation}
+           A: ~ m_{A_{/\alpha}} = 0
+        \end{equation}
+        \item Centro di controllo:
+        \begin{equation}
+           C: ~ m_{C_{/\delta_e}} = 0
+        \end{equation}
+        \item Punto Neutro:
+        \begin{equation}
+            N: ~
+        \end{equation}
+        \item Parametro di stabilità di Borri
+        \begin{equation}
+            e:=\frac{x_G-x_A}{x_A-x_C}
+        \end{equation}
+        \item Attitude lift
+        \begin{equation}
+            L^a = L_{/\alpha} (\alpha-\alpha_0)
+        \end{equation}
+        \item Portanza di controllo - Control lift
+        \begin{equation}
+            L^c = L_{/\delta_e} (\delta_e-\delta_{e_0})  
+        \end{equation}
+        \item Equazioni di Borri:
+        \begin{equation}
+            \begin{cases}
+                L^a = (1+e)W\\
+                L^c = -eW
+            \end{cases}
+        \end{equation}
+        \item Aerodynamic length
+        \begin{equation}
+            d = x_A-x_C
+        \end{equation}
+    \end{itemize}
+    
+\subsection{Stability}
+    \begin{itemize}
+        \item Static stability condition - control FIXED stability
+        \begin{equation}
+            \frac{\partial}{\partial \alpha}m_G(\alpha,\delta_e)<0 \hspace{2mm} \Rightarrow \hspace{2mm}x_A<x_G
+        \end{equation}
+        \item Control FREE stability condition
+        \begin{equation}
+            \frac{\partial}{\partial \alpha}m_G(\alpha,H_e)<0 \hspace{2mm} \Rightarrow \hspace{2mm}x_A'<x_G
+        \end{equation}
+        \item Control free stability - stick condition
+        \begin{equation}
+            \frac{\partial F_S}{\partial V}<0 \hspace{2mm} \Rightarrow \boxed{\frac{\partial H_e}{\partial V}<0}
+        \end{equation}
+        \item Tail volume coefficient
+        \begin{equation}
+            V^{ht} = \frac{S^{ht}}{S}\frac{x_G-x_{A^{ht}}}{c}
+        \end{equation}
+   
+    \end{itemize}
+\subsection{Maneuvers}
+    \begin{itemize}
+        \item Equivalent angle of attack point
+        \begin{equation}
+            E: \left[L_{/q}\right]_E=0
+        \end{equation}
+        \item Excess attitute lift
+        \begin{equation}
+            \Delta L^a = L_{/\alpha}(\alpha_E-\alpha_{LF})
+        \end{equation}
+        \item Excess control lift
+        \begin{equation}
+            \Delta L^c = L_{/\delta_e}(\delta_e-\delta_{e_{LF}})
+        \end{equation}
+    \end{itemize}

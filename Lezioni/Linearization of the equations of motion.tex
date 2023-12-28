@@ -1,0 +1,240 @@
+\section{Linearization of the equations of motion}
+Linearization comes in handy when one needs to capture the typical behavior of the aircraft. It is accurate only near to a reference condition, namely the reference condition around which the system is linearized, but allows to forecast the behavior through powerful methods like the eigen-analysis (which of course cannot be applied to the non-linear system).
+\\
+The linearization is applied to the generalized equilibrium. To linearize, a perturbative approach is used:
+\begin{align}
+    \underline{W}_P &= \underline{W}_{P_0} + \Delta \underline{W}_P & \underline{\dot W}_P &= \underline{\dot W}_{P_0} + \Delta \underline{\dot W}_P & \underline{r}_P &= \underline{r}_{P_0} + \Delta \underline{r}_P .
+\end{align}
+The reference conditions appear in such a way that the derivatives are removed from the system. Also, taking P coincident to the center of gravity G, the terms of the equation become:
+\begin{equation}
+    vari termini
+\end{equation}
+
+and the linearized equations result in
+\begin{equation}
+\begin{cases}
+m(\Delta\underline{\dot v}_{G|I}+\underline{\omega}_{\beta|I_0}\times \Delta\underline{v}_{G|I}+\Delta\underline{\omega}_{\beta|I}\times\underline{v}_{G|I_0})=\Delta\underline{f}_a+\Delta\underline{f}_g\\
+\underline{\underline{J}}_G\Delta\underline{\dot\omega}_{\beta|I}+\underline{\omega}_{\beta|I_0}\times \underline{\underline{J}}_G\Delta\underline{\omega}_{\beta|I}+\Delta\underline{\omega}_{\beta|I}\times\underline{\underline{J}}_G\underline{\omega}_{\beta|I_0} = \Delta \underline{m}_{G_a}
+    \end{cases}
+\end{equation}
+\subsubsection{Forcing term analysis}
+Decomposition of the forcing terms in reference plus perturbation values.
+\begin{equation}
+    \textit{Decomposition}
+\end{equation}
+Once the decomposition is written, the aim is to write the expressions of the perturbation aerodynamic coefficients using variables that are already appearing in the equations.
+\\
+The main question is: what kind of dependencies can be expected?
+Basically all the variables that are already present in the formulation, namely velocity, angular velocity, control surfaces deflections and thrust throttle; and in addition we have also the properties of the fluid, namely the effects of compressibility (mach number) and viscosity (Reynolds number).
+\\
+The aerodynamic coefficients can be therefore written as follows:
+\begin{align}
+\label{eq: linear form of aerodynamic coefficient}
+    \Delta C_i = &\left[\left.\frac{\partial C_i}{\partial \underline{v}_{P|I}^\beta}\right|_0\Delta\underline{v}_{P|I}^\beta+\left.\frac{\partial C_i}{\partial \underline{\omega}_{P|I}^\beta}\right|_0\Delta\underline{\omega}_{P|I}^\beta+\left.\frac{\partial C_i}{\partial \underline{\dot v}_{P|I}^\beta}\right|_0\Delta\underline{\dot v}_{P|I}^\beta\right]+
+\end{align}
+\begin{align*}
+    & \left[\left.\frac{\partial C_i}{\partial \delta_e}\right|_0\Delta\delta_e+\left.\frac{\partial C_i}{\partial \delta_a}\right|_0\Delta\delta_a+\left.\frac{\partial C_i}{\partial \delta_r}\right|_0\Delta\delta_r+\left.\frac{\partial C_i}{\partial \delta_T}\right|_0\Delta\delta_T\right]+\\
+    &\left[\left.\frac{\partial C_i}{\partial Ma}\right|_0\Delta Ma+\left.\frac{\partial C_i}{\partial Re}\right|_0\Delta Re\right]
+\end{align*}
+where the "i" subscript means generic coefficient.
+\\
+The components are deliberately separated into 3 groups because they are called differently:
+\begin{itemize}
+    \item The first group is called "stability derivatives"
+    \item The second group is called "control derivatives"
+    \item The third group is called "flight regime derivatives"
+\end{itemize}
+\subsection{Non-dimensional analysis}
+Using a non-dimensionalization of the system that we got so far allows to extend the analysis to very different aircraft without considering the absolute size of the vehicle. This means that we can then compare performances of aircrafts with very different sizes. 
+Let's define
+\begin{itemize}
+    \item $(u,\Delta v, \Delta w)$ as:
+    \begin{equation}
+        \begin{cases}
+                   u = \frac{\Delta U}{U_0}\\ 
+            \Delta v = \frac{\Delta V}{U_0}\\ 
+            \Delta w = \frac{\Delta W}{U_0}\\ 
+        \end{cases} 
+    \end{equation}
+    \item $(\Delta \hat{p},\Delta \hat{q},\Delta \hat{r})$
+    \begin{equation}
+        \begin{cases}
+            \Delta \hat{p} = \frac{\Delta pb}{2U_0}\\
+            \Delta \hat{q} = \frac{\Delta qc}{2U_0}\\
+            \Delta \hat{r} = \frac{\Delta rb}{2U_0}
+        \end{cases}
+    \end{equation}
+    \item $(u,\Delta v, \Delta w)$ as:
+    \begin{equation}
+        \begin{cases}
+            \Delta \hat{\dot u} = \frac{\Delta \dot U}{U_0} c_1\\
+            \Delta \hat{\dot v} = \frac{\Delta \dot V}{U_0} b_1\\
+            \Delta \hat{\dot w} = \frac{\Delta \dot W}{U_0} c_1\\
+        \end{cases} 
+    \end{equation}
+    where $b_1 = b/2U_0$ and $c_1 = c/2U_0$  
+\end{itemize}
+The quantity just defined are strictly non-dimensional by definition!
+\\
+Let's now introduce the hypothesis of longitudinal velocity much greater than the lateral velocity. This assumption let's the definition of sideslip angle and angle of attack as:
+\begin{align}
+    \Delta \beta & = \frac{\Delta V}{U_0} = \Delta v & \Delta \alpha & = \frac{\Delta W}{U_0} = \Delta w
+\end{align}
+
+Let's introduce also a new set  of scaled quantities, which this time are dimensional (not non-dimensional)
+
+\begin{equation}
+    \begin{cases}
+               \dot u = \frac{\Delta \dot U}{U_0}\\
+        \Delta \dot v = \frac{\Delta \dot V}{U_0}\\
+        \Delta \dot w = \frac{\Delta \dot W}{U_0}\\
+    \end{cases} 
+\end{equation}
+
+Now we are ready to start the non-dimensionalization process. We will obtain a set of equations that are strictly speaking non-dimensional, with the r.h.s. as unknown. We also want to express l.h.s. and r.h.s. with familiar quantities, which are typically available or interesting to measure. In particular the target quantities are
+\begin{enumerate}
+    \item scaled linear accelerations;
+    \item non-dimensional velocity;
+    \item dimensional angular rates;
+    \item dimensional angular accelerations.
+\end{enumerate}
+\subsubsection{Vector form}
+The quantities just defined can be expressed in vector form as follows:
+\begin{itemize}
+    \item  non-dimensional velocity
+    \begin{equation}
+        \Delta \underline{v}_{G|I}^\beta  = \begin{Bmatrix}
+            \Delta U\\
+            \Delta V\\
+            \Delta W\\
+        \end{Bmatrix} \Rightarrow 
+        \Delta \underline{\hat{v}}_{G|I}^\beta  = \Delta \underline{v}_{G|I}^\beta \cdot \frac{1}{U_0} =\begin{Bmatrix}
+            u\\
+            \Delta v\\
+            \Delta w\\
+        \end{Bmatrix}=\begin{Bmatrix}
+            u\\
+            \Delta \beta\\
+            \Delta \alpha\\
+        \end{Bmatrix},
+    \end{equation}
+    
+    \item non-dimensional angular rates
+    \begin{equation}
+        \Delta \underline{\omega}_{G|I}^\beta  = \begin{Bmatrix}
+            \Delta p\\
+            \Delta q\\
+            \Delta r\\
+        \end{Bmatrix} \Rightarrow 
+        \Delta \underline{\hat{\omega}}_{G|I}^\beta  = \underline{\underline{D}}^\beta \cdot \frac{1}{2U_0}\Delta \underline{\omega}_{G|I}^\beta  =\begin{Bmatrix}
+            \Delta p b_1\\
+            \Delta q c_1\\
+            \Delta r b_1\\
+        \end{Bmatrix}=\begin{Bmatrix}
+            \Delta \hat{p}\\
+            \Delta \hat{q}\\
+            \Delta \hat{r}\\
+        \end{Bmatrix},
+    \end{equation}
+
+    \item
+    \begin{equation}
+        \Delta \underline{v}_{G|I}^\beta  = \begin{Bmatrix}
+            \Delta \dot U\\
+            \Delta \dot V\\
+            \Delta \dot W\\
+        \end{Bmatrix} \Rightarrow 
+        \Delta \underline{\hat{\dot v}}_{G|I}^\beta  = \underline{\underline{E}}^\beta \cdot \frac{1}{2U_0^2}\Delta \underline{\dot v}_{G|I}^\beta  =\begin{Bmatrix}
+            \hat{\dot u}\\
+            \Delta \hat{\dot v}\\
+            \Delta \hat{\dot w}\\
+        \end{Bmatrix}=\begin{Bmatrix}
+            \hat{\dot u}\\
+            \Delta \hat{\dot \beta}\\
+            \Delta \hat{\dot \alpha}\\
+        \end{Bmatrix},
+    \end{equation}
+    
+     \item scaled linear accelerations
+     \begin{equation}
+        \Delta \underline{\dot v}_{G|I}^\beta  = \begin{Bmatrix}
+            \Delta \dot{U}\\
+            \Delta \dot{V}\\
+            \Delta \dot{W}\\
+        \end{Bmatrix} \Rightarrow 
+        \Delta \underline{\dot{\hat{v}}}_{G|I}^\beta  = \Delta \underline{\dot v}_{G|I}^\beta \cdot \frac{1}{U_0} =\begin{Bmatrix}
+            \dot u\\
+            \Delta \dot v\\
+            \Delta \dot w\\
+        \end{Bmatrix}=\begin{Bmatrix}
+            \dot u\\
+            \Delta \dot \beta\\
+            \Delta \dot \alpha\\
+        \end{Bmatrix},
+    \end{equation}
+\end{itemize}
+
+where $\underline{\underline{D}}^\beta = \begin{bmatrix}
+    b_1 & 0 & 0 \\ 0 & c_1 & 0 \\ 0& 0& b_1
+\end{bmatrix}$ and $\underline{\underline{E}}^\beta = \begin{bmatrix}
+    c & 0 & 0 \\ 0 & b & 0 \\ 0& 0& c
+\end{bmatrix}$.
+\subsection{Non-dimensionalization process}
+Let's start from the momentum balance. Divide both sides by $\frac{1}{2}\rho_0u_0^2S$, which is a force dimensionally speaking.
+For the moment of momentum balance, instead, we divide by $\frac{1}{2}\rho_0u_0^2 S\underline{\underline{D}}^\beta$.
+\\
+Defining 
+\begin{equation}
+    m_1  = \frac{m}{\frac{1}{2}\rho_0U_0S}
+\end{equation}
+(note that it's $U_0$, not $U_0^2$) it is possible to write the non-dimensional form of the momentum balance
+\begin{equation}
+    m_1(\underline{\dot{\hat{v}}}_{G|I}^\beta + \underline{\omega}_{\beta|I}^\beta \times \Delta \underline{\hat v}_{G|I}^\beta + \Delta \underline{\omega}_{\beta|I}^\beta \times \underline{\hat v}_{G|I}^\beta)=r.h.s.
+\end{equation}
+To perform the non-dimensionalization of the moment of momentum balance we need to introduce the following quantities:
+\begin{align}
+    J_{x_1} &= \frac{J_x}{\frac{1}{2}\rho_0U_0^2Sb} &
+    J_{xz_1} &= \frac{J_{xz}}{\frac{1}{2}\rho_0U_0^2Sb} &
+    J_{y_2} &= \frac{J_y}{\frac{1}{2}\rho_0U_0^2Sb} &
+    J_{z_1} &= \frac{J_z}{\frac{1}{2}\rho_0U_0^2Sb} \\
+    J_{x_2} &= \frac{J_x}{\frac{1}{2}\rho_0U_0^2Sc} &
+    J_{xz_2} &= \frac{J_{xz}}{\frac{1}{2}\rho_0U_0^2Sc} &
+    J_{y_1} &= \frac{J_y}{\frac{1}{2}\rho_0U_0^2Sc} &
+    J_{z_2} &= \frac{J_z}{\frac{1}{2}\rho_0U_0^2Sc} 
+\end{align}
+and perform the actual non-dimensionalization \textbf{(which I will not write here now due to time restictions)}.
+
+\subsection{Right hand side of the equations}
+The right hand side of the momentum balance contains the aerodynamic forces, which non-dimensionalized become
+\begin{equation}
+    \Delta \underline{f}_a^\beta = \frac{\Delta \underline{f}_a^\beta}{\frac{1}{2}\rho_0U_0^2S}=2u \begin{Bmatrix}
+        C_{x_0}\\
+        C_{y_0}\\
+        C_{z_0}
+    \end{Bmatrix} +
+    \begin{Bmatrix}
+        \Delta C_x\\
+        \Delta C_y\\
+        \Delta C_z
+    \end{Bmatrix}
+\end{equation}
+and the aerodynamic moment, which becomes:
+\begin{equation}
+    \underline{m}_{G_a}^\beta = \underline{\underline{D}}^{\beta^{-1}} \frac{\underline{m}_{G_a}^\beta}{\frac{1}{2}\rho_0U_0^2S} = 2u \begin{Bmatrix}
+        C_{L_{G_0}}\\
+        C_{M_{G_0}}\\
+        C_{N_{G_0}}
+    \end{Bmatrix}+
+    \begin{Bmatrix}
+       \Delta C_{L_{G}}\\
+       \Delta C_{M_{G}}\\
+       \Delta C_{N_{G}}
+    \end{Bmatrix}
+\end{equation}
+
+The full expression, which I will not report here because it's too long, maybe I will in the future, is the expansion of the $\Delta C_i$ coefficient in the form that we saw in [\ref{eq: linear form of aerodynamic coefficient}], leading to a matrix form depending on the multiple variables appearing in that expression.
+\\
+\textbf{Here we introduce the hypothesis} of small sensitivity to Reynolds and Mach and therefore eliminate them from the formulation, but theoretically we should consider them.
+\\
+
+

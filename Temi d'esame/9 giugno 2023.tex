@@ -1,0 +1,37 @@
+\subsection{9th June 2023}
+\begin{enumerate}
+    \item \textbf{Write the equilibrium equations for the steady climbing flight of a jet airplane, deriving the expressions for the angle of climb and the rate of climb. Discuss the conditions for the steepest climb, also in relation to the airplane's polar curve.}
+    \item \textbf{Plot typical Sizing Matrix Plot curves for the take-off and landing distances for a CS-25 category jet aircraft and describe the corresponding analytical models. What is the effect of reducing the value of the required take.-off distance? What is the effect of reducing the value of the required landing distance?}
+    \item \textbf{Define the components of the aerodynamic force resultant in the aerodynamic (wind) axes. Derive the expression of its components in body axes, knowing that the matrix that transforms the body-axes components of a vector in the aerodynamic-axes components is}
+    \begin{equation}
+        \begin{bmatrix}
+            \cos\alpha \cos\beta & \sin \beta  & \sin\alpha \cos\beta\\
+            -\cos\alpha \sin\beta & \cos \beta & -\sin\alpha \sin \beta\\
+            -\sin \alpha & 0 & \cos\alpha
+        \end{bmatrix}
+    \end{equation}
+    \textbf{specialize such expressions to the case of symmetric flight.}
+    \item \textbf{Define the longitudinal control-free aerodynamic and control centers of an airplane. Demonstrate that the longitudinal control-free and control-fixed control centers alays coincide.}
+    \item \textbf{Considering propulsion forces, with the help of qualitative sketches and analytic definitions, discuss:}
+    \begin{itemize}
+        \item \textbf{the sign of the contribution of engine positionin on the reference value of the pitching moment in equilibrium, i.e. $C_{M_{G_0}}$}
+        \item \textbf{the contribution to $C_{M_{G_\alpha}}$ due to the propellers in a pulling or pushing configuration}
+    \end{itemize}
+    \item \textbf{Consider the expression of the yawing moment coefficient due to wing dihedral}
+    \begin{equation}
+        C_{N_G}^{\Gamma,w} = \frac{-2\beta\Gamma}{Sb} (C_l -C_{d_\alpha}) \int_0^{b/2}c(y) y dy
+    \end{equation}
+    \begin{itemize}
+        \item \textbf{Compute the corresponding derivative $C_{N_{G_\beta}}^{\Gamma,w}$.}
+        \item \textbf{Show what is the typical sign of this derivative for aircraft with a negative dihedral, and saywhether this contribution is directionally stabilizing or not.}
+    \end{itemize}
+    \item \textbf{Consider the problem of stability augmentation in lateral-directional motion.}
+    \begin{itemize}
+        \item \textbf{Introduce a logical scheme for a roll/yaw SAS in a linearized framework, clearly naming each block in it and its function, and identifying the signals in each branch of the scheme.}
+        \item \textbf{Then, for that logic, define a typical proportional control law for the SAS, explaining the content of the arrays and matrices involved.}
+        \item \textbf{Finally, considering the simplified model for dynamic equilibrium around the roll axis}
+        \begin{equation}
+            J_{x_1} \Delta\dot p - b_1 C_{L_{G_\beta}}\Delta p = C_{L_{G_{\delta_a}}}\Delta\delta_a
+        \end{equation}
+    \end{itemize}
+\end{enumerate}

@@ -1,0 +1,678 @@
+\section{Rigid body}
+There are different ways to represent an aircraft and it movements, depending on what we are interested in. The simplest way is the rigid 3D body.
+\subsection{Reference systems}
+\label{sec: reference frames}
+The reference systems can also differ, depending on whether the need is to consider kinematic or dynamic-related quantities.
+\\
+
+\begin{enumerate}
+    \item Inertial reference frame:\\
+    the definition of a generic inertial reference frame is that it is not subject to linear acceleration or rotation. Keep in mind rotation is always related to centrifugal acceleration.
+    \item Earth-inertial system (\textbf{I}):\\
+    it is an inertial reference frame with the following properties:
+    \begin{itemize}
+        \item origin is centered in the center of Earth;
+        \item $i_1$ and $i_2$ define the equator plane;
+        \item $i_3$ is aligned with the rotation axis of Earth, towards north pole.
+    \end{itemize}
+    Note that with this definition it is not fully defined, as it can be rotated with respect to the rotation axis of the Earth at any degree. Also it is not strictly inertial as the trajectory of Earth is not a line but an ellipse. It is inertial only in the short term.
+    \item Earth-fixed system (\textbf{E}):
+    \\
+    Again, an inertial reference frame with the following properties:
+    \begin{itemize}
+        \item Origin centered in the centere of Earth
+        \item $e_1$ and $e_2$ define the equatorial plane;
+        \item $e_3 \parallel i_3$ from center to north pole;
+        \item $e_1$ and $e_2$ are attached to Earth, so they actually have a rotational speed, but it is very slow so it is almost inertial.
+    \end{itemize}
+    Note: it is used by the GPS.
+    \item Navigational System ($\mathbf{\Tilde{N}}$):
+    \begin{itemize}
+        \item Origin is a point on the surface of Earth;
+        \item $n_1$ and $n_2$ define a plane locally tangent to the surface of the Earth
+        \item $\Tilde{n}_1$ is oriented towards North pole;
+        \item $\Tilde{n}_2$ is oriented towards East;
+        \item $\Tilde{n}_3$ is oriented towards the center of the Earth.
+    \end{itemize}
+    This frame is particularly useful because the down direction is aligned wth gravity.
+    \item Local Vertical Reference System (\textbf{N}):
+    \begin{itemize}
+        \item Origin in the center of gravity of the aircraft G;
+        \item $N$ axes parallel to Navigation frame $\Tilde{N}$.
+    \end{itemize}
+    \item Body System (\textbf{B}):
+    \begin{itemize}
+        \item Origin on an arbitrary point of the aircraft, typically the center of gravity G or ... (unreadable)
+        \item $b_1$ and $b_3$ lie on the vertical symmetry plane of the aircraft
+        \item $b_1$ is aligned with a longitudinal direction
+        \item $b_2$ pointing to the right
+    \end{itemize}
+    Note that $b_3$ with this definition can freely rotate accordingly to the frame, it is not strictly oriented towards down. 
+    \\
+    This is \textbf{not} the only definition of the body axes, as they can be totally arbitrary, this is only a \textbf{common} definition.
+    \\
+    Generally not inertial
+    \item Stability System (\textbf{S}):\\
+    it is defined starting from \textbf{B}, so the origin is the same as \textbf{B}.
+    \begin{itemize}
+        \item $s_1$ and $s_3$ lie on the vertical symmetry plane of the aircraft;
+        \item $s_1$ is aligned with the projection of the velocity on the symmetry plane
+        \item $s_2$ points to the right
+    \end{itemize}
+    This is only employed for eigenanalysis and also allows to define the angle of attack as the angle between $b_1$ and $s_1$.
+    \item Wind System (\textbf{W}):\\
+    again it is defined starting from the body system:
+    \begin{itemize}
+        \item Origin coincident with body system;
+        \item $w_1$ aligned with the wind;
+        \item $w_3$ lies in the plane of symmetry;
+        \item $w_2$ comes as a consequence.
+    \end{itemize}
+    It allows for easy definition of the aerodynamic angles (AoA and SS) \todo[inline]{(\ac{AoA} and \ac{SS})}
+    and also allows for the definition of the aerodynamical forces:
+    \begin{itemize}
+        \item Lift is aligned with $-w_3$;
+        \item Drag is aligned with $-w_1$;
+        \item Lateral force is aligned with $-w_2$.
+    \end{itemize}
+
+    \item Path(?) frame: \\
+    defined by the trajectory of the vehicle:
+    \begin{itemize}
+        \item $p_1$ is aligned with the velocity vector,
+        \item $p_2$ is in the plane of the horizon ($\Tilde{n}_1,\Tilde{n}_2$)
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Rotations}
+There are many ways to describe rotations, even though the rotation is the same; the three most common ways are Euler angles, direction cosine matrix (DCM) and quaternions.
+\\
+For our purpose we want to link a generic reference frame with the earth inertial frame, therefore we want to describe the transformation that rotates J into K (generic frame).
+\begin{enumerate}
+    \item \textbf{Euler angles}:\\
+    The Euler angles describe a precise sequence of planar rotations, each of which is described by an axis of rotation and an intensity $\sigma$.
+    \\
+    The problem with the Euler angles is that many different sequences can yield to the same 3D rotation.
+    \\
+    \textbf{Tait-Bryan rotations}\\
+    The rotation sequence is the following: [$i_3$, $i'_2$, $i''_1$], where the superscript relates to the target reference frame: 
+    \\
+    To generate the Tait-Bryan sequence there are two possible mathematical ways, which are conceptually different: the Rotation of a vector and the change of reference.
+    \\
+    \begin{itemize}
+        \item \textbf{Rotation} of a vector is a linear operator that preserves the norm (intensity) but changes the direction. 
+        \item \textbf{Change of reference}: express the components of a vector in another reference frame.        
+    \end{itemize}
+    The difference is in the stressed quantity, namely in the rotation of a vector what we describe is the transformation, the rotation tensor, while in the second case we just express the components in another reference frame.
+    \\
+    \textbf{Properties of rotations}: 
+        Orthogonality:
+        \begin{equation}
+            R^T_{J\to K} = R^{-1}_{J\to K},
+        \end{equation}
+        or similarly
+        \begin{equation}
+            R_{J\to K} * R^T_{J\to K} = I, 
+        \end{equation}        
+    -there is the proof of this in the notes, \autoref{appendix: proofs}-\\
+    \textbf{Composition of rotations}:\\
+    Consider three vectors v,w and q such that:
+    \begin{align}
+        w &= R_{J\to K }~v, & q&= R_{K\to F}~w.
+    \end{align}
+    Clearly:
+    \begin{equation}
+        q = R_{K\to F} (R_{J\to K }~v),
+    \end{equation}
+    which means that 
+    \begin{equation}
+        q =( R_{K\to F} ~R_{J\to K })~v,
+    \end{equation}
+    from which
+    \begin{equation}
+        R_{J\to F} = R_{K\to F} ~R_{J\to K },
+    \end{equation}
+    This means that we can express vectors in different reference frames by applying the rotation tensors in different reference frames:
+    \begin{equation}
+        q^J = R_{J\to F}^J v^J = R_{K\to F}^J R_{J\to K}^J ~v^J,
+    \end{equation}
+    Do you see the problem here? There is the rotation matrix from K to F which is expressed in reference J, and it is not trivial to express such matrix!\\
+    Actually, from the expressions that we introduced we can express this matrix as the product of three matrices:
+    \begin{equation}
+        R_{K\to F}^J = R_{J\to K}^{J/K} ~R_{K\to F}^{K/F} ~R_{J\to K}^{{J/K}^T}.
+    \end{equation}
+    Therefore we have the expression we were looking for.
+    \\
+    If we substitute this matrix in the expression of q we get to a simpler expression:
+    \begin{equation}
+        q = R_{J\to K}^{J/K} ~R_{K\to F}^{K/F} ~R_{J\to K}^{{J/K}^T} ~R_{J\to K}^J ~v^J,
+    \end{equation}
+    The last two matrices cancel out to identity, therefore we get to:
+    \begin{equation}
+        q = R_{J\to K}^{J/K} ~R_{K\to F}^{K/F}  ~v^J.
+    \end{equation}
+    \textbf{Change of reference of a vector through composed rotations}:\\
+    eh lol again\\
+    {\color{red}sono solo lunghe da scrivere qua, conviene guardarle sugli appunti per il momento}
+    Then he does the Tait-Bryan transformation using the properties just defined.
+    \\
+    In terms of representation:
+    \begin{equation}
+        \underline{\underline{R}}_{I\to K}^{I|K} = \underline{\underline{R}}_{I\to I'}^{I|I'} ~\underline{\underline{R}}_{I'\to I''}^{I'|I''} ~\underline{\underline{R}}_{I''\to K}^{I''|K} 
+    \end{equation}
+    The same applies to the change of reference of a vector, obtained by means of a composed rotation matrix.
+\end{enumerate}
+
+\subsection{Kinematics}
+For what concerns kinematics we now need to introduce two concepts: the poisson rule and the moving axes theorem.
+\begin{enumerate}
+    \item \textbf{Poisson Rule}\\
+    The Poisson rule describes the derivative in time of a unit vector. \\
+    Let's consider an inertial frame I and a rotating reference K. K is connected to I by a rotation tensor $\underline{\underline{R}}_{I\to K}(t) $ which depends on time.
+    \\
+    It is possible to define a rotational speed vector $\underline{r}_{K|I}(t) $ which describes the angular velocity of the vector in K with respect to the reference I in time.
+    If we consider the unit vector of reference K, namely $k_1, k_2, k_3$, the Poisson's rule says that
+    \begin{equation}
+    \underline{\dot k}_i = \underline{\omega}_{K|I}\times \underline{k}_i,
+    \end{equation}
+    which means that the time derivative of each component is the cross product between the rotation vector and each component of K.
+    \\
+    The application of the Poisson's rule to the whole reference leads to 
+    \begin{equation}
+        \frac{d}{dt}\left[\underline{k}_1^I|\underline{k}_2^I|\underline{k}_3^I\right] = \underline{\omega}_{K|I}^I\times \underline{\underline{R}}_{I\to K}^{I|K}
+    \end{equation}
+    Here we define the left hand side as the time derivative of the rotation matrix R:
+    \begin{equation}
+        \boxed{\underline{\underline{\dot R}}_{I\to K}^{I|K} = \underline{\omega}_{K|I}^I\times \underline{\underline{R}}_{I\to K}^{I|K}}
+    \end{equation}
+    For this formula there are 3 important remarks:
+    \begin{itemize}
+        \item $\underline{\underline{\dot R}}_{I\to K}^{I|K}$ is not invariant in the representation, either in I or K;
+        \item The same applies for $\underline{\omega}_{K|I}^I$;
+        \item $\underline{\underline{R}}_{I\to K}^{I|K}$ is indeed invariant.
+    \end{itemize}
+    \item \textbf{Moving axes theorem}\\
+        Consider an inertial frame I, a rotating frame K and the rotation vector $\omega_{K|I}$.
+        \\
+       Assuming that we know the rate of change of a vector $\underline{v}$ in K, and we want to express the same quantity in I. The moving axis theorem says that
+        \begin{equation}
+            \left(\frac{d}{dt}\underline{v}\right)^I = \left( \frac{d}{dt}\underline{v}\right)^K+\underline{\omega}_{K|I}\times \underline{v}
+        \end{equation}
+    Remark: the equality
+    \begin{equation}
+        \omega_{K|I}^I = \omega_{K|I}^K
+    \end{equation}
+    is not true in general, it is valid only for planar rotations.
+\end{enumerate}
+
+\subsection{Kinematics - Motion of a Body}
+It is often convenient to describe the motion of a point on a body by composing the motion of the body with respect to an inertial reference and the motion of the points of the body with respect to the body reference.
+\\
+Generally speaking:
+\begin{equation}
+    \underline{r}_{IQ} = \underline{r}_{IP} + \underline{r}_{PQ}
+ \end{equation}
+which means that the position of Q in the inertial frame is the sum of the position of Q with respect to a generic point P that can be described in inertial frame and the position of P.
+\\
+For rigid bodies the vector $\underline{r}_{PQ}$ is a function of time but the modulus is constant.
+\\
+Now the question is how can we describe the rate of change of position.
+Let's define 
+\begin{equation}
+    \left(\frac{d}{dt}\underline{r}_{IQ}\right)^I  = \underline{v}_{Q|I}
+\end{equation}
+as the velocity of point Q w.r.t. reference I.
+\\
+Applying the moving axes theorem, considering that the movement of $\underline{r}_{PQ}$ is a rotation, then it is possible to express 
+\begin{equation}
+    \left(\frac{d}{dt}\underline{R}_{IQ}\right)^I = \underline{v}_{Q|\beta} + \underline{\omega}_{\beta|J}\times \underline{R}_{PQ}
+\end{equation}
+so the complete expression of the velocity of Q is
+\begin{equation}    
+    \underline{v}_{Q|I} = \underline{v}_{Q|\beta} + \underline{v}_{Q|\beta} + \underline{\omega}_{\beta|J}\times \underline{R}_{PQ}
+\end{equation}
+The same procedure goes for the acceleration, which is the rate of change of velocity. Jumping to the result:
+\begin{equation}
+    \underline{a}_{Q|I} = \underline{a}_{P|I} + \underline{a}_{Q|\beta} + 2\underline{\omega}_{\beta|I} \times \underline{v}_{Q|\beta} + \underline{\alpha}_{\beta|I} \times \underline{R}_{PQ} + \underline{\omega}_{\beta|I}\times \underline{\omega}_{\beta|I}\times \underline{R}_{PQ},
+\end{equation}
+where 
+\begin{equation}
+    \underline{\alpha}_{\beta|I} = \left(\frac{d}{dt}\underline{\omega}_{\beta|I}\right)^I
+\end{equation}
+
+remarks:
+\begin{itemize}
+    \item $2\underline{\omega}_{\beta|I} \times \underline{v}_{Q|\beta}$ is called Coriolis component;
+    \item $\underline{\omega}_{\beta|I}\times \underline{\omega}_{\beta|I}\times \underline{R}_{PQ}$ is called centrifugal acceleration
+    \item The previous derivation can be applied also to non inertial frame I. However, it is especially interesting to analyze the case of an inertial reference I, in particular because the Newton's law ( F=ma) only holds in inertial systems.
+    \item There are several scenarios where measurements are taken in body reference and they need to be translated into the inertial reference. 
+\end{itemize}
+
+\subsection{Quasi (or Almost) Inertial Frames}
+Some reference systems have been said to be "almost inertial". We can try to identify such feature by looking at two different reference frames: the inertial system and the navigational system. If we compute the acceleration of a point P on the surface of Earth, which is relatively easy knowing the rotational speed and the position of P, we get that the result is not so different from the acceleration of a point at 11 km altitude. Furthermore, the acceleration will be maximized when the point on the surface is located at the equator. The difference between the accelerations of two distant points measured in this way gives an idea of how inertial a system is. If the difference is minimal the system can be considered inertial.
+
+\subsection{Attitude angles}
+Let's define the attitude angles the angles that describe the rotation between the navigational frame and the body frame, with a Tait-Bryan sequence:
+\begin{itemize}
+    \item $\sigma_1 = \psi$ (around $\underline{i}_3$) is the \textbf{yaw} angle,
+    \item $\sigma_2 = \theta$ (around $\underline{i}'_2$) is the \textbf{pitch} angle,
+    \item $\sigma_3 = \varphi$ (around $\underline{i}''_1$) is the \textbf{roll} angle,
+\end{itemize}
+
+\subsection{Spherical coordinates}
+Rotation between the Earth fixed frame and the navigational frame $\Tilde{N}$
+\begin{itemize}
+    \item $\sigma_1 = L$ (around $\underline{e}_3$) is the latitude,
+    \item $\sigma_2 = -\left(\lambda + \frac{\pi}{2}\right)$ (around $\underline{e}'_2$) is the longitude,
+    \item $\sigma_3 = 0$ 
+\end{itemize}
+
+\subsection{Wind angles}
+Rotation between the body frame and the wind frame:
+\begin{itemize}
+    \item $\sigma_1 = -\beta$ (around $\underline{b}_3$) is the opposite of the sideslip angle,
+    \item $\sigma_2 = \alpha$ (around $\underline{b}'_2$) is the angle of attack, 
+    \item $\sigma_3 = 0$ 
+\end{itemize}
+
+\subsection{Path angles}
+Describes the rotation between the navigation frame and the path frame:
+\begin{itemize}
+    \item $\sigma_1 = \chi$ is the track angle,
+    \item $\sigma_2 = \gamma$ is the climb angle,
+    \item $\sigma_3 = 0$
+\end{itemize}
+\textbf{A note on velocity and airspeed}\\
+In general those two quantities are not the same, because one defines the rate of change of position wrt to an inertial frame or an observer, while the airspeed is a measure of the relative motion between the aircraft and air. In space for example the airspeed is null because there is no air. When air is still the two can be confounded.
+\subsection{Euler angle rates}
+There are many reasons why we are interested in the rate of change of the attitude angles, but probably the most important is the way the Euler angles are estimated on board, which is via gyroscopes. The problem is that gyroscopes measure only the rates of change of the attitude angles, therefore we need a way to express it.
+\\
+Let's define the angular rates in body components:
+\begin{equation}
+    \underline{\omega}_{\beta|I}^\beta = \begin{Bmatrix}
+        p\\q\\r
+    \end{Bmatrix}
+\end{equation}
+But these are not necessarily the same as 
+\begin{equation}
+    \underline{\dot e}_{321}^\beta = \begin{Bmatrix}
+        \dot \varphi \\
+        \dot \theta \\
+        \dot \psi 
+    \end{Bmatrix},
+\end{equation}
+in fact, we are interested in the relationship between these two expressions.
+In mathematical terms
+\begin{equation}
+    \underline{\omega}_{\beta|I} = \underline{\dot \psi}+\underline{\dot \theta}+\underline{\dot \varphi},
+\end{equation}
+but we also have to remember that the Euler angles are defined wrt three different frames, which come from successive rotations, therefore one obtains
+\begin{align}
+    \underline{\dot \psi}^I &= \begin{Bmatrix}
+        0\\0\\ \dot\psi
+    \end{Bmatrix}, &
+    \underline{\dot \theta}^{I'} &= \begin{Bmatrix}
+        0\\ \dot \theta\\ 0
+    \end{Bmatrix}, &
+    \underline{\dot \varphi}^{I''} &= \begin{Bmatrix}
+        \dot\varphi\\0\\ 0
+    \end{Bmatrix}.
+\end{align}
+The problem now is to express these quantities in body axes, to link the two expressions.
+\begin{equation}
+    \underline{\omega}_{\beta|I}^\beta = \underline{\dot \psi}^\beta + \underline{\dot \theta}^\beta + \underline{\dot \varphi}^\beta
+\end{equation}
+where
+\begin{align}
+    \underline{\dot \varphi}^\beta &= \underline{\underline{R}}_{I''\to \beta}^{T~I''|\beta}\begin{Bmatrix}
+        \dot \varphi \\ 0 \\ 0
+    \end{Bmatrix} &
+    \underline{\dot \theta}^\beta &= \underline{\underline{R}}_{I''\to \beta}^{T~I''|\beta}\cdot \underline{\underline{R}}_{I'\to I''}^{T~I'|I''}\begin{Bmatrix}
+        0 \\ \dot \theta \\ 0
+    \end{Bmatrix}&
+    \underline{\dot \psi}^\beta &= \underline{\underline{R}}_{I''\to \beta}^{T~I''|\beta}\cdot \underline{\underline{R}}_{I'\to I''}^{T~I'|I''}\cdot \underline{\underline{R}}_{I\to I'}^{T~I|I'}\begin{Bmatrix}
+        0 \\ 0 \\ \dot \psi
+    \end{Bmatrix}
+\end{align}
+we will call the resultant transformation $S_{321}^\beta$:
+\begin{equation}
+   \begin{Bmatrix}
+        p\\q\\r
+    \end{Bmatrix} = \underline{\underline{S}}_{321}^\beta \begin{Bmatrix}
+        \dot \varphi\\
+        \dot \theta\\
+        \dot \psi
+    \end{Bmatrix}
+\end{equation}
+Or in other words:
+\begin{equation}    
+\label{eq: omega to euler rates}
+\boxed{\underline{\omega}_{\beta|I}^\beta = \underline{\underline{S}}_{321}^\beta \cdot \underline{\dot e}_{321}^\beta}
+\end{equation}
+Remarks: sometimes we need to perform the inverse transformation, and this is done by inverting the matrix $\underline{\underline{S}}_{321}^\beta$
+The inverse will not depend on the yaw angle! (proof on the notes). Also, for small pitch and roll both the direct and inverse transformation are close to identity. If instead the pitch is close to 90 degrees then the problem is not invertible. This condition is also known as \textit{gimbal lock}. This singularity makes the integration of motion more tricky. \textbf{This is the limit of the Tait-Bryan approach to the description of rotations. To solve this issue quaternions are introduced.}
+
+\subsection{Dynamics}
+Let's consider an inertial system I and a point $Q$ on a rigid body associated to a point mass $dm$. The rigid body is associated to an attached reference $\beta$ and the Newton's law holds, which in mathematical terms writes:
+\begin{equation}
+    \delta \underline{f}_Q = \delta m \underline{a}_{Q|I}.
+\end{equation}
+To write this principle for a rigid body representing the aircraft we need first to provide a description for the acceleration $\underline{a}_{Q|I}$ and then to sum up the contribution from all point masses composing the rigid body.
+\\
+To express acceleration we can rely on the hypothesis of rigid body, which allows to simplify the expressions and also we know that we can express derivatives wrt a body reference $\beta$.
+\\
+Starting from the definition of velocity
+\begin{equation}
+    \underline{v}_{Q|I} = \underline{v}_{P|I}+\underline{v}_{Q|\beta}+\underline{\omega}_{\beta|I}\times \underline{r}_{PQ}
+\end{equation}
+we can apply the definition of rigid body to know that the second addend is null in the rhs.
+\\
+Therefore, acceleration is
+\begin{equation}
+    \left(\frac{d}{dt}\underline{v}_{Q|I}\right)^I = \left(\frac{d}{dt}\underline{v}_{P|I}\right)^I +\left(\frac{d}{dt}\underline{\omega}_{\beta|I}\right)^I\times \underline{r}_{PQ} + \underline{\omega}_{\beta|I} \times\left(\frac{d}{dt}\underline{r}_{PQ}\right)^I 
+\end{equation}
+Expanding the terms (more details on the notes) we get to the expression that we need:
+\begin{equation}
+    \underline{a}_{Q|I} = \left(\frac{d}{dt}\underline{v}_{P|I}\right)^\beta + \underline{r}_{PQ}\times \underline{\alpha}_{\beta|I} + \underline{\omega}_{\beta|I}\times \left(\underline{v}_{P|I}- \underline{r}_{PQ} \times \underline{\omega}_{\beta|I} \right).
+\end{equation}
+This expression describes the acceleration of a point on the body and we can now integrate over the body extension to get an expression of the Newton's law for the entire body.
+\begin{equation}
+    \delta \underline{f}_Q = \delta m \underline{a}_{Q|I} \to \int_B\delta \underline{f}_Q = \int_B\delta m \underline{a}_{Q|I}
+\end{equation}
+the lhs is the total force applied to the body and we can just call it $\underline{f}$.
+\\
+The rhs can be decomposed into 4 integrals, which describe one different aspect each:
+\begin{itemize}
+    \item 
+     \begin{equation}
+    \int_B\delta m \left(\frac{d}{dt}\underline{v}_{P|I}\right)^\beta = m \left(\frac{d}{dt}\underline{v}_{P|I}\right)^\beta 
+\end{equation}
+is the acceleration of the center of the body reference which is a constant (note: P is not necessarily the center of mass in this dissertation).
+\item 
+\begin{equation}
+    \int_B -\delta m ~\underline{r}_{PQ}\times \underline{\alpha}_{\beta|I} = -\underline{\underline{S}}_P \underline{\alpha}_{\beta|I}
+\end{equation}
+is the angular acceleration of the body wrt to P, which is associated to the inertia matrix $\underline{\underline{S}}_P \underline{\alpha}_{\beta|I}$
+\item 
+\begin{equation}
+    \int_B \delta m ~\underline{\omega}_{\beta|I}\times \underline{v}_{P|I} = m \underline{\omega}_{P|I}\times \underline{v}_{P|I}
+\end{equation}
+
+\item 
+\begin{equation}
+    \int_B -\delta m ~\underline{\omega}_{\beta|I} \times \underline{r}_{PQ} \times \underline{\omega}_{\beta|I} = -\underline{\omega}_{\beta|I}\times \underline{\underline{S}}_P\underline{\omega}_{\beta|I}
+\end{equation}
+
+\end{itemize}
+In these expression we get that mass and static moment of inertia have the following expressions:
+\begin{align}
+    m &= \int_B \delta m & \underline{\underline{S}}_P &= \int_B \delta m \underline{r}_{{PQ}_\times}
+\end{align}
+
+Now an interesting question should rise in the mind of the reader: what is $\underline{r}_{{PQ}_\times}$? This is the so-called \textit{skew-symmetric form} of vector $\underline{r}_{PQ}$ and is retrieved as follows:
+\begin{align}
+    \underline{P} &= \begin{bmatrix}
+        p_1\\p_2\\p_3
+    \end{bmatrix} &\underline{P}_\times &= \begin{bmatrix}
+        0 & -p_3 & p_2 \\
+        p_3 & 0 & -p_1 \\
+        -p_2 & p_1 & 0 
+    \end{bmatrix}.
+\end{align}
+Going back to $\underline{\underline{S}}_P$ we define the static moment of body $B$ as $\underline{\delta}_P = \int_B \delta m \underline{r}_{PQ}$, which is a vector. Its skew-symmetric form is defined as $\underline{\underline{S}}_P = \underline{\sigma}_{P_\times}$.
+\\
+Substituting these definitions for all components, we obtain an expression of Newton's law for the entire body which writes:
+\begin{equation}
+    \underline{f} = \left(\frac{d}{dt}\underline{v}_{P|I}\right)^\beta \cdot m + \underline{\underline{S}}_P^T\underline{\alpha}_{\beta|I} + \underline{\omega}_{\beta|I} \times \left(m \underline{v}_{P|I}+\underline{\underline{S}}_P^T\underline{\omega}_{\beta|I}\right)
+\end{equation}
+one useful remark: the skew-symmetric form is anti-symmetric, which means that
+\begin{equation}
+    \underline{\underline{S}}_P = -\underline{\underline{S}}_P^T
+\end{equation}
+The moment of momentum balance theorem is a result of Newton's second law. In an inertial reference, the moment exerted on a point mass in Q, $\delta \underline{m}_Q = \underline{r}_{PQ}\times\delta\underline{f}_Q$, equals the change in moment of momentum of the mass $\delta m \underline{r}_{PQ} \times \underline{\alpha}_{Q|I}$.
+\begin{equation}
+    \delta \underline{m}_Q = \delta m (\underline{r}_{PQ} \times \underline{\alpha}_{Q|I})
+\end{equation}
+substituting the acceleration in the rhs and integrating, after some manipulation (on notes) we get to:
+\begin{equation}
+    \underline{m}_P = \underline{\underline{S}}_P\left(\frac{d}{dt}\underline{v}_{P|I}\right)^\beta + \underline{\underline{J}}_P\underline{\alpha}_{\beta|I} + \underline{v}_{P|I}\times (\underline{\underline {S}}_P^T\underline{\omega}_{\beta|I}) + \underline{\omega}_{\beta|I}\times (\underline{\underline{S}}_P\underline{v}_{P|I} + \underline{\underline{J}}_P\underline{\omega}_{\beta|I})
+\end{equation}
+where 
+\begin{equation}
+    \underline{\underline{J}}_P = -\left[\int_B(\underline{r}_{PQ_\times}\underline{r}_{PQ_\times})\delta m\right]
+\end{equation}
+is the moment of inertia.
+\\
+This formulation is called \textit{\textbf{agnostic}}, and it is the same for whatever problem where an Inertial and a body frame are defined and the body is rigid.
+\subsection{Generalised formulation for the equations of motion}
+We would like to express the aforementioned equations in a more memory friendly manner. To obtain such objective it is possible to define
+\begin{itemize}
+    \item a generalized velocity vector
+\begin{equation}
+    \underline{w}_P = \begin{Bmatrix}
+        \underline{v}_{P|I}\\
+        \underline{\omega}_{\beta|I}
+    \end{Bmatrix},
+\end{equation}
+\item a generalized force vector
+\begin{equation}
+    \underline{r}_P = \begin{Bmatrix}
+        \underline{f}\\
+        \underline{m}_P
+    \end{Bmatrix},
+\end{equation}
+\item a generalized mass term
+\begin{equation}
+    \underline{\underline{M}}_P = \begin{bmatrix}
+        m\underline{\underline{I}} & \underline{\underline{S}}_P^T\\
+        \underline{\underline{S}}_P & \underline{\underline{I}}_P
+    \end{bmatrix},
+\end{equation}
+\item and the South-West cross product operator $\swcross$ which applies to 6-dimensional vectors defined such that for
+\begin{equation}
+    \underline{p} = \begin{Bmatrix}
+        \underline{q}\\
+        \underline{s}
+    \end{Bmatrix}
+\end{equation}
+its South-West product is
+\begin{equation}
+    \underline{p}\swcross = \begin{bmatrix}
+        \underline{S}_\times & \underline{\underline{0}}\\
+        \underline{q}_\times & \underline{S}_\times
+    \end{bmatrix}.
+\end{equation}
+\end{itemize}
+Employing these definitions the momentum balance and moment of momentum balance are wrapped in a simple form:
+\begin{equation}
+    \label{eq:generalized form of balance equations}\boxed{\underline{\underline{M}}_P+\underline{\dot w}_P+\underline{w}_P\swcross\underline{\underline{M}}\underline{w}_P=\underline{r}_P}
+\end{equation}
+Ok now, this is the general form, but it is possible to introduce some hypotheses related to aircraft in flight, including the expression of forces and moments, 
+\begin{equation}
+    \underline{r}_P = \underline{r}_{P_a}+\underline{r}_{P_g}  =
+    \begin{Bmatrix}
+        \underline{f}_a\\ \underline{m}_{P_a} 
+    \end{Bmatrix}
+    + \begin{Bmatrix}
+        \underline{f}_g \\ \underline{m}_{P_g}  
+    \end{Bmatrix}
+\end{equation}
+Where the first components are related to aerodynamic and propulsive forces, while the second to gravity.
+\\
+Furthermore, taking P coincident to the center of gravity G, two main simplifications can be introduced: the moment component of gravity is reduced to zero, and the static moment of inertia becomes null and therefore the generalized mass matrix becomes diagonal. Additionally, an aircraft is symmetric, so the inertia matrix has some components eluded.
+\begin{itemize}
+    \item No moment in gravity term
+    \begin{equation}
+        \underline{r}_P = \underline{P}_G = \begin{Bmatrix}
+            \underline{f}_a+\underline{f}_g\\
+            \underline{m}_{G_a} + \cancel{\underline{m}_{G_g}}
+        \end{Bmatrix} 
+    \end{equation}
+    \item 
+    \begin{equation}
+        \underline{\underline{S}}_G = \underline{\underline{0}} \rightarrow \underline{\underline{M}}_G = \begin{bmatrix}
+            m\underline{\underline{I}} & \underline{\underline{0}}\\
+            \underline{\underline{0}} & \underline{\underline{J}}_G
+        \end{bmatrix}
+    \end{equation}
+    \item 
+    \begin{equation}
+        \underline{\underline{J}}_G^\beta = \begin{bmatrix}
+            J_x & 0 & J_{xz}\\
+            0 & J_y & 0\\
+            J_{zx} & 0 & J_z
+        \end{bmatrix}
+    \end{equation}
+\end{itemize}
+These lead to the non-generalized equations of motion for an aircraft in G in body components.
+\begin{equation}
+    \begin{cases}
+        m(\underline{\dot v}_{G|I} + \underline{\omega}_{\beta|I}\times \underline{v}_{G|J}) = \underline{f}_a+\underline{f}_g\\
+        \underline{\underline{J}}_G\underline{\alpha}_{\beta|I}+\underline{\omega}_{\beta|I}\times\underline{\underline{J}}_G\underline{\omega}_{\beta|I} = \underline{m}_{G_a}
+    \end{cases}    
+\end{equation}
+Here the professor recalls the definition of body reference frame, exactly the same as defined in \ref{sec: reference frames}.
+
+The components appearing in the inertia matrix are defined as follows:
+\begin{align}
+    J_x &= \int_B \delta m(y_b^2 + z_b^2) & J_y &= \int_B \delta m(x_b^2 + z_b^2) \\ J_z &= \int_B \delta m(x_b^2 + y_b^2) & J_{xz} &= \int_B \delta m(x_bz_b)
+\end{align}
+The other components are null due to symmetry, while the xz component is not because the aircraft is not symmetrical in that plane.
+\\
+Let's now represent the vector quantities by components in body frame $\beta$.
+\begin{equation}
+\underline{v}_{G|I}^\beta =     \begin{Bmatrix}
+        U\\V\\W
+    \end{Bmatrix},
+\end{equation}
+respectively the longitudinal, the lateral and the vertical velocity.
+\begin{equation}
+\underline{\omega}_{G|I}^\beta =     \begin{Bmatrix}
+        p\\q\\r
+    \end{Bmatrix},
+\end{equation}
+respectively the roll rate, the pitch rate and the yaw rate.
+\begin{equation}
+\underline{f}_{a}^\beta =     \begin{Bmatrix}
+        X\\Y\\Z
+    \end{Bmatrix},
+\end{equation}
+\begin{equation}
+\underline{m}_{G_a}^\beta =     \begin{Bmatrix}
+        L_G\\M_G\\N_G
+    \end{Bmatrix},
+\end{equation}
+respectively rolling moment, pitching moment, yawing moment.
+\begin{equation}
+\underline{f}_{g}^\beta =   \underline{\underline{R}}_I^{T_{I|\beta}}  \underline{f}_g^I = \underline{\underline{R}}_I^{T_{I|\beta}}  \begin{Bmatrix}
+    0\\0\\mg
+\end{Bmatrix} = \begin{Bmatrix}
+    -mg~\sin\theta\\
+    mg~\sin\varphi\cos\theta\\
+    mg~\cos\varphi\cos\theta
+\end{Bmatrix}.
+\end{equation}
+
+The corresponding scalar form of the equations of motions become
+\begin{equation}
+    \begin{cases}
+        \begin{cases}
+            m(\dot U + (Wq-Vr)) = X - mg~\sin\theta\\
+            m(\dot V + (Ur-Wp)) = Y + wg \cos\theta \sin\varphi\\
+            m(\dot W + (Vp -Uq)) = Z + mg\cos\theta \cos\varphi
+        \end{cases}\\
+        \begin{cases}
+            J_x \dot p - J_{xz}(\dot r - pq) + (J_x - J_y) rq  = L_G\\
+            J_y \dot q - J_{xz}(r^2 - p^2) + (J_x - J_z) pr  = M_G\\
+            J_z \dot r - J_{xz}(\dot p - qr) + (J_y - J_x) pq  = N_G
+        \end{cases}
+    \end{cases}
+\end{equation}
+In this system we have 6 scalar equations and 9 unknowns! (Actually 8 because yaw do not appear in the equations, gravity does not depend on yaw).
+\\
+To get a balance you need more relationships, and you can find them recalling the relationship between the angular velocity vector and the variation of the euler angles \ref{eq: omega to euler rates}, which in scalar components become:
+\begin{equation}
+    \begin{cases}
+        \dot \varphi = p + \tan\theta \sin\varphi ~q + \cos\varphi\tan\theta ~r\\
+        \dot \theta =  \cos \varphi~q - \sin\varphi ~r\\
+        \dot \psi = \frac{\sin\varphi}{\cos\theta}~q + \frac{\cos\varphi}{\cos\theta}~r
+    \end{cases}
+\end{equation}
+So now the system is complete and solvable.
+The complete system writes:
+
+\begin{equation}
+    \begin{cases}
+        \begin{cases}
+            m(\dot U + (Wq-Vr)) = X - mg~\sin\theta\\
+            m(\dot V + (Ur-Wp)) = Y + wg \cos\theta \sin\varphi\\
+            m(\dot W + (Vp -Uq)) = Z + mg\cos\theta \cos\varphi
+        \end{cases}\\
+        \begin{cases}
+            J_x \dot p - J_{xz}(\dot r - pq) + (J_x - J_y) rq  = L_G\\
+            J_y \dot q - J_{xz}(r^2 - p^2) + (J_x - J_z) pr  = M_G\\
+            J_z \dot r - J_{xz}(\dot p - qr) + (J_y - J_x) pq  = N_G
+        \end{cases}\\
+        \begin{cases}
+        \dot \varphi = p + \tan\theta \sin\varphi ~q + \cos\varphi\tan\theta ~r\\
+        \dot \theta =  \cos \varphi~q - \sin\varphi ~r\\
+        \dot \psi = \frac{\sin\varphi}{\cos\theta}~q + \frac{\cos\varphi}{\cos\theta}~r
+    \end{cases}
+    \end{cases}
+\end{equation}
+Let's remark some information about the system we just written. This is the most complete description of the dynamics of an aircraft, but it is too complex to forecast its behavior based only on the knowledge of its characteristics. Furthermore, the inertia has coupling effects, which means that the aircraft has reactions on axis which are different from the one the force is exerted on with aerodynamic moment, mainly due to the fact that the inertia matrix is not diagonal and due to the non-null rotational speed components around those axes.
+To simplify the description we need to linearize the system.
+
+\subsection{Generalized equilibrium - static}
+The general 9x9 system is solvable in a condition of static equilibrium.
+Starting from the generalized form of dynamic equilibrium
+\begin{equation}
+\label{eq: generalized form of dynamic equilibrium}
+    \begin{cases}
+        \underline{\underline{M}}_P+\underline{\dot w}_P+\underline{w}_P\swcross\underline{\underline{M}}\underline{w}_P=\underline{r}_P\\
+        \underline{\dot e}_{321}^\beta = \underline{\underline{S}}_{321}^{ \beta^{-1}}\underline{\omega}_{\beta|I}^\beta
+    \end{cases},
+\end{equation}
+
+a static equilibrium condition is such that 
+\begin{equation}
+\begin{cases}
+    
+
+    \underline{W}_G^\beta = \underline{\overline{W}}_G^\beta \Longleftrightarrow \underline{\dot W}_G = 0,\\
+    \underline{\delta} = \underline{\overline{delta}},
+    
+\end{cases}
+\end{equation}
+which means that velocity is constant (no acceleration) and the controls are not evolving (trim condition).\\
+We can apply this to the formulation to get the generalized equilibrium.
+In this formulation what is function of what?
+\\
+Clearly the aerodynamic forces and moments depend on the geometry of the aircraft, which include also the deflection angles of the aerodynamic surfaces; therefore we have:
+\begin{equation}
+    \underline{r}_G^\beta = \begin{Bmatrix}
+        \underline{f}_a^\beta +\underline{f}_g^\beta \\\underline{m}_{G_a}^\beta
+    \end{Bmatrix} = \begin{Bmatrix}
+        \underline{f}_a^\beta(\underline{W}_G^\beta,\underline{\dot W}_G^\beta,\delta)+\underline{f}_g^\beta \\\underline{m}_{G_a}^\beta(\underline{W}_G^\beta,\underline{\dot W}_G^\beta,\underline{\delta})
+    \end{Bmatrix},
+\end{equation}
+with $\underline{\delta}$ is the array of controls
+\begin{equation}
+    \underline{\delta} = (\delta_e, \delta_a, \delta_r, \delta_T),
+\end{equation}
+which stand for elevator, aileron and rudder deflections, and throttle percentage.
+\\
+Introducing the deflections into the equations of motion leads to a under-determined system, because now we have 13 unknowns and 9 equations. Therefore to solve the system we have to set 4 of the unknowns to a trim value, most probably the 4 deflections, and solve the equations in that particular condition.
+
+\subsubsection{Static equilibrium and angular velocity}
+From the definition of static equilibrium we get that roll and pitch in body components are null. This means that in terms of euler angles only the vertical component (yaw) of the angular velocity can be non null in the inertial reference. Meaning that we can actually have a non-null yaw rate and still have static equilibrium. In particular it is possible to define 4 specific cases:
+\begin{enumerate}
+    \item Steady level flight, $\dot \psi= 0$
+    \item Steady climb/descent (straight), $\dot \psi= 0$
+    \item Steady turn, $\dot \psi\neq 0$
+    \item Steady climbing/descending helix, $\dot \psi\neq 0$. Most general trimmed condition.
+\end{enumerate}
+
+Note: a trim condition is synonym to a static equilibrium.\\
+Note also that nothing is said about flight symmetry (which is the condition for which lateral body component V of the velocity is null).
+
