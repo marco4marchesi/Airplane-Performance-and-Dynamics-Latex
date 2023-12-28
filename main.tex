@@ -1,0 +1,281 @@
+\documentclass[11pt]{article}
+\renewcommand{\baselinestretch}{1}
+\usepackage[english]{babel}
+\usepackage[document]{ragged2e}
+
+% Text format packages
+\usepackage[utf8]{inputenc}
+\usepackage[margin=2cm]{geometry}
+\usepackage{imakeidx}
+\usepackage{blindtext}
+\usepackage{lipsum}
+\usepackage{anyfontsize}
+\usepackage{amssymb}
+\usepackage{dirtytalk}
+\usepackage{soul}
+\usepackage{cancel}
+
+%integrals with dash
+\def\Xint#1{\mathchoice
+{\XXint\displaystyle\textstyle{#1}}%
+{\XXint\textstyle\scriptstyle{#1}}%
+{\XXint\scriptstyle\scriptscriptstyle{#1}}%
+{\XXint\scriptscriptstyle\scriptscriptstyle{#1}}%
+\!\int}
+\def\XXint#1#2#3{{\setbox0=\hbox{$#1{#2#3}{\int}$ }
+\vcenter{\hbox{$#2#3$ }}\kern-.6\wd0}}
+\def\ddashint{\Xint=}
+\def\dashint{\Xint-}
+
+%unsure
+\usepackage{xargs}                      % Use more than one optional parameter in a new commands
+\usepackage[pdftex,dvipsnames]{xcolor}  % Coloured text etc.
+
+\usepackage[colorinlistoftodos,prependcaption,textsize=tiny]{todonotes}
+\newcommandx{\unsure}[2][1=]{\todo[linecolor=red,backgroundcolor=red!25,bordercolor=red,#1]{#2}}
+\newcommandx{\change}[2][1=]{\todo[linecolor=blue,backgroundcolor=blue!25,bordercolor=blue,#1]{#2}}
+\newcommandx{\info}[2][1=]{\todo[linecolor=OliveGreen,backgroundcolor=OliveGreen!25,bordercolor=OliveGreen,#1]{#2}}
+\newcommandx{\improvement}[2][1=]{\todo[linecolor=Plum,backgroundcolor=Plum!25,bordercolor=Plum,#1]{#2}}
+\newcommandx{\thiswillnotshow}[2][1=]{\todo[disable,#1]{#2}}
+
+% Graphic packages
+\usepackage{graphicx}
+\usepackage{svg}
+\usepackage{xcolor}
+\usepackage{float}
+\usepackage{tikz,caption}
+\usetikzlibrary{calc,positioning,shapes.geometric,shapes.symbols,shapes.misc,patterns,angles,quotes,arrows}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage[pscoord]{eso-pic}
+\usepackage{hyperref}
+\usepackage{bm}
+
+% Grid packages
+%\usepackage[grid, gridunit=mm, gridcolor=magenta!100, subgridcolor=cyan!20]{eso-pic}
+
+% Various packages
+\usepackage{booktabs} % for much better looking tables
+\usepackage{array} % for better arrays (eg matrices) in maths
+\usepackage{amsmath}
+\usepackage{multirow}
+\usepackage{multicol}
+\usepackage{wasysym}
+\usepackage{textcomp}
+\usepackage[footnote,printonlyused]{acronym}
+\usepackage{scrextend}
+\deffootnote[0cm]{0cm}{10cm}
+{\textsuperscript{\thefootnotemark}\,\enskip}
+\usepackage{makecell, tabularx}
+\usepackage{longtable}
+\renewcommand\theadfont{\normalsize\bfseries}
+\newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{?}{!{\vrule width 2pt}}
+\usepackage{setspace}
+\usepackage{enumitem, amssymb}
+\newlist{todolist}{itemize}{2}
+\setlist[todolist]{label=$\square$}
+\usepackage{pifont}
+\newcommand{\cmark}{\ding{51}}%
+\newcommand{\done}{\rlap{$\square$}{\raisebox{2pt}{\large\hspace{1pt}\cmark}}}%
+
+\usepackage[backend=biber, style=numeric, sorting=none]{biblatex}
+%\addbibresource{bibliography.bib}
+\usepackage{rotating}
+
+% Header
+\usepackage{fancyhdr} % This should be set AFTER setting up the page geometry
+\definecolor{mygrey}{RGB}{30,30,30}
+\pagestyle{fancy} % options: empty , plain , fancy
+\setlength\headheight{25pt}
+\renewcommand{\headrulewidth}{0pt} % customise the layout...
+\chead{}
+\lhead{}
+\rhead{\textcolor{mygrey}{\rule[-6mm]{0.3mm}{1cm}} \hspace{5mm} \vspace{-5mm}\textbf{\scriptsize \textcolor{mygrey}{Airplane Performance and Dynamics}}\\ \scriptsize \textcolor{mygrey}{Prof. Riboldi}}
+\lfoot{}\cfoot{\thepage}\rfoot{}
+
+
+\setlength{\parindent}{0pt}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    filecolor=magenta,      
+    urlcolor=blue,
+    citecolor=black,
+    pdftitle={Progetto di Aerodinamica},
+    pdfpagemode=FullScreen,
+    }
+
+\newcommand{\placetextboxl}[3]{% \placetextbox{<horizontal pos>}{<vertical pos>}{<stuff>}
+  \setbox0=\hbox{#3}% Put <stuff> in a box
+  \AddToShipoutPictureFG*{% Add <stuff> to current page foreground
+    \put(\LenToUnit{#1\paperwidth},\LenToUnit{#2\paperheight}){\vtop{{\null}\makebox[0pt][l]{#3}}}%
+  }%
+}%
+
+
+\newcommand{\placetextboxr}[3]{% \placetextbox{<horizontal pos>}{<vertical pos>}{<stuff>}
+  \setbox0=\hbox{#3}% Put <stuff> in a box
+  \AddToShipoutPictureFG*{% Add <stuff> to current page foreground
+    \put(\LenToUnit{#1\paperwidth},\LenToUnit{#2\paperheight}){\vtop{{\null}\makebox[0pt][r]{#3}}}%
+  }%
+}%
+
+\newcommand{\placetextbox}[3]{% \placetextbox{<horizontal pos>}{<vertical pos>}{<stuff>}
+  \setbox0=\hbox{#3}% Put <stuff> in a box
+  \AddToShipoutPictureFG*{% Add <stuff> to current page foreground
+    \put(\LenToUnit{#1\paperwidth},\LenToUnit{#2\paperheight}){\vtop{{\null}\makebox[0pt][c]{#3}}}%
+  }%
+}%
+
+\usepackage{rotating,stackengine}
+\newcommand\swcross{\mathbin{\mkern-5mu\rotatebox[origin=c]{-45}{%
+  \ensurestackMath{\stackengine{.07ex}{\downarrow}{-\mkern-10mu-}
+  {O}{c}{F}{F}{L}}}\mkern-5mu}}
+
+% Nomenclature
+%Adds nomenclature
+\usepackage{nomencl}
+\makenomenclature
+\usepackage{etoolbox}
+\renewcommand\nomgroup[1]{%
+  \item[\bfseries
+  \ifstrequal{#1}{N}{Quantità Adimensionali}{%
+  \ifstrequal{#1}{P}{Quantità Fisiche}{%
+  \ifstrequal{#1}{S}{Pedici ed Apici}{%
+  \ifstrequal{#1}{C}{Coefficienti}{%
+  \ifstrequal{#1}{D}{Derivate}{%
+  \ifstrequal{#1}{A}{Acronimi ed Abbreviazioni}{}}}}}}%
+]}
+
+% This will add the units
+%----------------------------------------------
+\newcommand{\nomunit}[1]{%
+\renewcommand{\nomentryend}{\hspace*{\fill}#1}}
+
+
+
+
+% Document beginning
+\begin{document}
+
+\thispagestyle{empty}
+
+\vspace{0.4cm}
+
+
+\vspace*{2.0cm}
+
+\centering
+{\Huge Airplane Performance \& Dynamics \\- \vspace{4mm}\\ sigle e definizioni}
+
+\rule[0.1mm]{16cm}{0.1mm}
+
+\vspace{0.5cm}
+
+\centering
+\begin{Large}
+\today
+\end{Large}
+
+\vspace{0.5cm}
+
+
+\placetextboxr{0.700}{0.202}{\large Marchesi Marco}        \placetextboxl{0.780}{0.202}{\large 10616312}
+
+\placetextboxl{0.130}{0.120}{\large {A.A. 2021/22}}
+\placetextboxl{0.130}{0.100}{\large {Docente: Lorenzo Trainelli \& Carlo E.D. Riboldi}}
+
+% \newpage
+
+\justify
+
+% % Index + Nomenclature
+% \thispagestyle{empty}
+% \renewcommand{\contentsname}{Indice}
+% \tableofcontents
+
+% \mbox{}
+% \twocolumn
+% \thispagestyle{empty}
+% % Physical
+% \nomenclature[P]{\textbf{c}}{Corda alla radice \nomunit{[$m$]}}
+% \nomenclature[P]{\textbf{b}}{Apertura alare  \nomunit{[$m$]}}
+% \nomenclature[P]{\textbf{$\Lambda$}}{Angolo di freccia \nomunit{[$^\circ$]}}
+% \nomenclature[P]{\textbf{d}}{Angolo diedro \nomunit{[$^\circ$]}}
+% \nomenclature[P]{\textbf{$\delta$}}{Angolo di deflessione \nomunit{[$^\circ$]}}
+% \nomenclature[P]{\textbf{U}}{Velocità \nomunit{[$m/s$]}}
+% \nomenclature[P]{\textbf{$\alpha$}}{Angolo di incidenza \nomunit{[$^\circ$]}}
+% \nomenclature[P]{\textbf{$\beta$}}{Angolo di deriva \nomunit{[$^\circ$]}}
+% \nomenclature[P]{\textbf{$\Gamma$}}{Circolazione \nomunit{[$m^2/s$]}}
+% \nomenclature[P]{\textbf{$\rho$}}{Densità \nomunit{[$Kg/m^3$]}}
+% \nomenclature[P]{\textbf{$L$}}{Portanza \nomunit{[$N$]}}
+% \nomenclature[P]{\textbf{$\rho$}}{Densità \nomunit{[$Kg/m^3$]}}
+% %\nomenclature[P]{\textbf{$D$}}{Resistenza indotta \nomunit{[$Kg/m^3$]}}
+
+% % Abbreviations
+% \nomenclature[A]{\textbf{M}}{Pannelli lungo la semi-apertura alare}
+% \nomenclature[A]{\textbf{N}}{Pannelli lungo la corda}
+% %\nomenclature[A]{\textbf{G}}{Centro di massa}
+% \nomenclature[A]{\textbf{x}}{Asse di rollio}
+% \nomenclature[A]{\textbf{y}}{Asse di beccheggio}
+% \nomenclature[A]{\textbf{z}}{Asse di imbardata}
+% \nomenclature[A]{\textbf{$\mathcal{L}$}}{Momento rispetto all'asse di rollio}
+% \nomenclature[A]{\textbf{$\mathcal{M}$}}{Momento rispetto all'asse di beccheggio}
+% \nomenclature[A]{\textbf{$\mathcal{N}$}}{Momento rispetto all'asse di imbardata}
+% % Subscripts and Superscripts
+% \nomenclature[S]{\textbf{w}}{Ala}
+% \nomenclature[S]{\textbf{wgl}}{\textit{Winglet}}
+% \nomenclature[S]{\textbf{hs}}{Stabilizzatore orizzontale}
+% \nomenclature[S]{\textbf{ht}}{Impennaggio orizzontale}
+% \nomenclature[S]{\textbf{e}}{Equilibratore}
+% \nomenclature[S]{\textbf{vs}}{Deriva}
+% \nomenclature[S]{\textbf{vt}}{Impennaggio verticale}
+% \nomenclature[S]{\textbf{r}}{Timone}
+% \nomenclature[S]{\textbf{i}}{Indotta}
+% % Quantità adimensionali
+% \nomenclature[N]{\textbf{$\lambda$}}{Rapporto di rastremazione}
+
+% % Coefficienti
+% \nomenclature[C]{\textbf{$C_{x}$}}{Coefficiente di forza lungo x}
+% \nomenclature[C]{\textbf{$C_{y}$}}{Coefficiente di forza lungo y}
+% \nomenclature[C]{\textbf{$C_{z}$}}{Coefficiente di forza lungo z}
+% \nomenclature[C]{\textbf{$C_{\mathcal{L}}$}}{Coefficiente di momento rispetto a x}
+% \nomenclature[C]{\textbf{$C_{\mathcal{M}}$}}{Coefficiente di momento rispetto a y}
+% \nomenclature[C]{\textbf{$C_{\mathcal{N}}$}}{Coefficiente di momento rispetto a z}
+
+% % Derivate
+% \nomenclature[D]{\textbf{$a_{/_{j}}$}}{Derivata di a rispetto a j}
+
+% \printnomenclature
+\newpage
+\onecolumn
+\pagenumbering{arabic}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% --- begin written document ---
+\input{Sigle/Sigle}
+\newpage
+\input{Lezioni/Rigid body}
+\input{Lezioni/Linearization of the equations of motion}
+
+\appendix
+\newpage
+\input{Definizioni/Definizioni}
+\newpage
+\input{appendices/Dimostrazioni}
+\newpage
+\section{Temi d'esame}
+\input{Temi d'esame/8 Febbraio 2023}
+\input{Temi d'esame/9 giugno 2023}
+
+
+
+
+
+\nocite{*}
+%\printbibliography
+
+\end{document}
